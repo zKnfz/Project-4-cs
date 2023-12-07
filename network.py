@@ -50,31 +50,27 @@ def direct(src, graph):
 
 
 def mst(src, graph):
-    # Initialize empty lists for heap creation
-    nodes = [src]
-    weights = [0]
-    queue = heap(nodes, weights)
-    weight = {node: float('inf') for node in graph}
-    weight[src] = 0
-    parent = {src: None}
+    # Prims to find MST -> already has a path
+    node = []
+    cost = []
+    res = defaultdict(dict)
+    for n in graph.keys():
+        node.append(n)
+        if n == src:
+            cost.append(0)
+        else:
+            cost.append(float('inf'))
 
-    while not queue.is_empty():
-        w, node = queue.pop()  # Get the node with the minimum weight
-        for neighbor in graph[node]:
-            edge_weight = graph[node][neighbor]  # Get the weight of the edge to the neighbor
-            if neighbor not in parent and edge_weight < weight[neighbor]:
-                parent[neighbor] = node
-                weight[neighbor] = edge_weight
-                # Update the heap with new weight
-                if neighbor in nodes:
-                    idx = nodes.index(neighbor)
-                    weights[idx] = edge_weight
-                else:
-                    nodes.append(neighbor)
-                    weights.append(edge_weight)
-                queue = heap(nodes, weights)  # Re-create the heap
+    q = heap(node, cost)
+    while not q.is_empty():
+        u = q.pop()[1]
+        for w in graph[u].keys():
+            c = graph[u][w]  # getting the relative cost from parent to destination
+            if c < q.prio(w):
+                q.decrease_key(w, c)
+                res[w] = u
+    return res
 
-    return parent
 
 
 def print_paths(graph, prev, msg, src):
